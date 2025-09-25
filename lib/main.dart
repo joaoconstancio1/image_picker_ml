@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker_ml/camera_page.dart';
 import 'package:image_picker_ml/image_picker_page.dart';
 
 void main() async {

@@ -25,9 +25,8 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
       appBar: AppBar(title: const Text('Image Picker ML')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: ListView(
           children: [
-            // Image section - smaller size
             Container(
               height: 200,
               width: double.infinity,
@@ -48,7 +47,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
                     ),
             ),
             const SizedBox(height: 16),
-            // Button
+
             ElevatedButton(
               onPressed: () {
                 showImagePickerBottomSheet();
@@ -56,67 +55,54 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
               child: const Text('Choose/Capture'),
             ),
             const SizedBox(height: 16),
-            // Labels section
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Detected Labels:',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+            Text(
+              'Detected Labels:',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            if (labels.isEmpty)
+              Container(
+                height: 100,
+                alignment: Alignment.center,
+                child: const Text(
+                  'No labels detected yet.\nSelect an image to see labels.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey),
+                ),
+              )
+            else
+              ...labels.asMap().entries.map((entry) {
+                int index = entry.key;
+                ImageLabel label = entry.value;
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: Text(
+                        '${index + 1}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    title: Text(
+                      label.label,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    subtitle: Text(
+                      'Confidence: ${(label.confidence * 100).toStringAsFixed(1)}%',
+                    ),
+                    trailing: Icon(
+                      Icons.verified,
+                      color: label.confidence > 0.8
+                          ? Colors.green
+                          : label.confidence > 0.6
+                          ? Colors.orange
+                          : Colors.red,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: labels.isEmpty
-                        ? const Center(
-                            child: Text(
-                              'No labels detected yet.\nSelect an image to see labels.',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: labels.length,
-                            itemBuilder: (context, index) {
-                              final label = labels[index];
-                              return Card(
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    backgroundColor: Colors.blue,
-                                    child: Text(
-                                      '${index + 1}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                  title: Text(
-                                    label.label,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  subtitle: Text(
-                                    'Confidence: ${(label.confidence * 100).toStringAsFixed(1)}%',
-                                  ),
-                                  trailing: Icon(
-                                    Icons.verified,
-                                    color: label.confidence > 0.8
-                                        ? Colors.green
-                                        : label.confidence > 0.6
-                                        ? Colors.orange
-                                        : Colors.red,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
+                );
+              }),
           ],
         ),
       ),
